@@ -19,7 +19,7 @@ int eepaddress = 0;
 
 void readbutton();
 
-volatile uint8_t effect = 0;
+uint8_t effect = 0;
 
 #define MAX_EFFECTS 5
 BaseEffect* effects[] = {
@@ -40,7 +40,6 @@ void setup() {
   
   pinMode(BUTTON_PIN, INPUT);
   
-
   effect = EEPROM.read(eepaddress);
   if(effect > MAX_EFFECTS) effect = 0;
 
@@ -48,13 +47,12 @@ void setup() {
 } // setup()
 
 void loop() {
-  readbutton();
-
   strip.loop();
+
+  readbutton();
 
   EVERY_N_SECONDS(1) {
     strip.switchTo(effect);
-    //Serial.print("Effect: "); Serial.println(effect);
   }
 } // loop()
 
@@ -63,16 +61,13 @@ void readbutton() {
 
   if(b == 1) {
     effect = (effect+1) % MAX_EFFECTS;
-    Serial.println("single click");
   }
 
   if(b == 2) {
     effect = 0;
-    Serial.println("double click");
   }
 
   if(b == 3) {
     EEPROM.write(eepaddress, effect);
-    Serial.println("button hold");
   }
-}
+} // readbutton()

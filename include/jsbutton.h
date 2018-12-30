@@ -4,6 +4,7 @@
  * By Jeff Saltzman
  *
  * Modified by: Andrew Tuline
+ * Modified by: Wolfram Webers
  * 
  * Oct. 13, 2009
  *
@@ -28,8 +29,8 @@ int holdTime = 1000;        // ms hold period: how long to wait for press+hold e
 
 
 // Button variables
-boolean buttonVal = HIGH;   // value read from button
-boolean buttonLast = HIGH;  // buffered value of the button's previous state
+boolean buttonVal = LOW;   // value read from button
+boolean buttonLast = LOW;  // buffered value of the button's previous state
 boolean DCwaiting = false;  // whether we're waiting for a double click (down)
 boolean DConUp = false;     // whether to register a double click on next release, or whether to wait and click
 boolean singleOK = true;    // whether it's OK to do a single click
