@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <LEDStrip.h>
+#include <EEPROM.h>
+#include <jsbutton.h>
 
 // Fixed definitions cannot change on the fly.
 #define LED_DT 12                                             // Data pin to connect to the strip.
@@ -13,8 +15,9 @@
 // Initialize global variables for sequences
 int thisdelay = 20;                                           // A delay value for the sequence(s)
 CRGB leds[NUM_LEDS];
+int eepaddress = 0;
 
-void button_ISR();
+void readbutton();
 
 volatile uint8_t effect = 0;
 
@@ -36,14 +39,17 @@ void setup() {
   delay(1000);                                                // Soft startup to ease the flow of electrons.
   
   pinMode(BUTTON_PIN, INPUT);
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), button_ISR, RISING);
+  
+
+  effect = EEPROM.read(eepaddress);
+  if(effect > MAX_EFFECTS) effect = 0;
 
   strip.begin(&FastLED.addLeds<LED_TYPE, LED_DT, LED_CK, COLOR_ORDER>(leds, NUM_LEDS));
 } // setup()
 
+void loop() {
+  readbutton();
 
-
-void loop() { 
   strip.loop();
 
   EVERY_N_SECONDS(1) {
@@ -52,7 +58,21 @@ void loop() {
   }
 } // loop()
 
-void button_ISR() {
-  effect++;
-  effect = (effect > MAX_EFFECTS) ? 0 : effect;
+void readbutton() {
+  uint8_t b = checkButton(BUTTON_PIN);
+
+  if(b == 1) {
+    effect = (effect+1) % MAX_EFFECTS;
+    Serial.println("single click");
+  }
+
+  if(b == 2) {
+    effect = 0;
+    Serial.println("double click");
+  }
+
+  if(b == 3) {
+    EEPROM.write(eepaddress, effect);
+    Serial.println("button hold");
+  }
 }
